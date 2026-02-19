@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday 🎂</title>
+
+<!-- ╔══════════════════════════════════════════════════════════╗
+     ║           🎨  HOW TO CUSTOMIZE THIS CARD               ║
+     ╠══════════════════════════════════════════════════════════╣
+     ║  1. NAME / MESSAGE → Edit CONFIG.name / CONFIG.message  ║
+     ║                                                          ║
+     ║  2. PHOTOS → Find the 📸 PHOTOS section below and       ║
+     ║     replace src="YOUR_PHOTO_1.jpg" with your image path  ║
+     ║     or a URL. Add/remove <div class="photo-item"> blocks ║
+     ║                                                          ║
+     ║  3. VIDEOS → Find the 🎬 VIDEOS section and replace     ║
+     ║     src="YOUR_VIDEO.mp4" with your video file,          ║
+     ║     OR swap <video> for <iframe> with a YouTube link     ║
+     ║                                                          ║
+     ║  4. CAPTIONS → Edit the text inside <p class="cap">     ║
+     ╚══════════════════════════════════════════════════════════╝ -->
+
+<script>
+const CONFIG = {
+  name:         "Jinal Jain",
+  message:      "Happy 18th Birthday Jinal Ji ye tohda jyada late ho gya gift but koina.Every moment with you is my favourite memory.I hope we will be together in future as friends.You light up my world in ways words can never capture.May your wishes comes true and Your Life will be wonderful.I wish that your future will be bright and from my bottom of my heart Ek aur bar happy birthday🤭💗🌹🥳.Wishing you a day as magical as you are. 💖",
+  from:         "With all my love, Parth Palshikar 💕",
+  primaryColor: "#ff6b9d",
+  accentColor:  "#ffd700",
+  bgColor1:     "#1a0533",
+  bgColor2:     "#0d1b4b",
+  numBalloons:  12,
+  numStars:     80,
+  sfxFireworks: true,
+  sfxBalloon:   true,
+  sfxSparkle:   true,
+  musicTempo:   88,
+};
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --primary: #ff6b9d; --accent: #ffd700; --bg1: #1a0533; --bg2: #0d1b4b; --glass: rgba(255,255,255,0.06); --border: rgba(255,255,255,0.13); }
+
+body {
+  min-height: 100vh; overflow-x: hidden;
+  font-family: 'Lato', sans-serif;
+  background: linear-gradient(160deg, var(--bg1), var(--bg2));
+  cursor: default;
+}
+
+/* ── BACKGROUND LAYERS ── */
+#stars-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+#fw-canvas    { position: fixed; inset: 0; pointer-events: none; z-index: 3; }
+
+.moon {
+  position: fixed; top: 60px; right: 80px;
+  width: 90px; height: 90px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fffde4, #f5d76e);
+  box-shadow: 0 0 40px 15px rgba(245,215,110,.35), 0 0 80px 30px rgba(245,215,110,.15);
+  animation: moonGlow 4s ease-in-out infinite alternate; z-index: 1;
+}
+@keyframes moonGlow {
+  to { box-shadow: 0 0 60px 25px rgba(245,215,110,.5), 0 0 120px 50px rgba(245,215,110,.22); }
+}
+.ground {
+  position: fixed; bottom: 0; left: 0; right: 0; height: 120px;
+  background: linear-gradient(to top, #0a2e0a, #1a5c1a 60%, transparent);
+  z-index: 1; pointer-events: none;
+}
+.ground::before {
+  content: ''; position: absolute; top: -20px; left: 0; right: 0; height: 40px;
+  background: radial-gradient(ellipse 6px 12px at 50% 100%, #1a5c1a 48%, transparent 50%) repeat-x;
+  background-size: 12px 24px;
+}
+.balloon-container { position: fixed; inset: 0; pointer-events: none; z-index: 2; }
+.balloon {
+  position: absolute; bottom: -140px; cursor: pointer; pointer-events: all;
+  animation: floatUp linear infinite; transform-origin: center bottom;
+}
+.balloon svg { width: 100%; filter: drop-shadow(0 4px 8px rgba(0,0,0,.3)); }
+.balloon::after { content: ''; display: block; width: 1px; height: 60px; background: rgba(255,255,255,.4); margin: 0 auto; }
+@keyframes floatUp {
+  0%   { transform: translateY(0) rotate(-4deg); opacity: 0; }
+  5%   { opacity: 1; }
+  50%  { transform: translateY(-50vh) rotate(4deg); }
+  95%  { opacity: 1; }
+  100% { transform: translateY(-110vh) rotate(-4deg); opacity: 0; }
+}
+.note { position: fixed; font-size: 1.4rem; animation: noteFloat 6s ease-in-out infinite; pointer-events: none; z-index: 3; opacity: 0; }
+@keyframes noteFloat {
+  0%   { transform: translateY(0) rotate(-10deg); opacity: 0; }
+  20%  { opacity: .7; }
+  80%  { opacity: .5; }
+  100% { transform: translateY(-200px) rotate(15deg) scale(1.4); opacity: 0; }
+}
+.click-ripple {
+  position: fixed; pointer-events: none; width: 10px; height: 10px; border-radius: 50%;
+  border: 2px solid var(--accent); transform: translate(-50%,-50%) scale(0);
+  animation: rippleOut .6s ease-out forwards; z-index: 100;
+}
+@keyframes rippleOut { to { transform: translate(-50%,-50%) scale(8); opacity: 0; } }
+
+/* ── PAGE WRAPPER ── */
+.page { position: relative; z-index: 10; max-width: 860px; margin: 0 auto; padding: 40px 20px 200px; }
+
+/* ══════════════════════════════════════
+   BIRTHDAY CARD
+══════════════════════════════════════ */
+.card {
+  background: var(--glass); backdrop-filter: blur(18px);
+  border: 1px solid var(--border); border-radius: 32px;
+  padding: 56px 52px; text-align: center; position: relative;
+  box-shadow: 0 32px 80px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);
+  animation: riseIn 1.2s cubic-bezier(.16,1,.3,1) both; margin-bottom: 60px;
+}
+@keyframes riseIn { from { opacity: 0; transform: translateY(60px) scale(.92); } to { opacity: 1; transform: none; } }
+
+.candles { display: flex; justify-content: center; gap: 8px; margin-bottom: 4px; }
+.flame {
+  width: 14px; height: 22px;
+  background: radial-gradient(ellipse at 50% 80%, #fff 10%, #ffd700 40%, #ff6b00 80%, transparent 100%);
+  border-radius: 50% 50% 30% 30%; filter: drop-shadow(0 0 6px #ff9900);
+  animation: flicker .6s ease-in-out infinite alternate;
+}
+@keyframes flicker { to { transform: scaleX(.85) scaleY(1.1) rotate(2deg); } }
+
+.cake-wrap { font-size: 5rem; display: block; margin: 4px 0 28px; animation: bounce 2.5s ease-in-out infinite; }
+@keyframes bounce { 50% { transform: translateY(-10px); } }
+
+.hb-label  { font-family: 'Playfair Display', serif; font-style: italic; font-size: .95rem; letter-spacing: .22em; text-transform: uppercase; color: var(--primary); margin-bottom: 6px; animation: fadeUp 1s .4s both; }
+.card-name { font-family: 'Playfair Display', serif; font-size: clamp(2.4rem,6vw,3.4rem); font-weight: 700; color: #fff; margin-bottom: 22px; animation: fadeUp 1s .6s both; }
+.card-name span { background: linear-gradient(120deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.divider  { width: 60px; height: 2px; background: linear-gradient(to right, transparent, var(--primary), transparent); margin: 0 auto 22px; animation: fadeUp 1s .7s both; }
+.card-msg { font-size: 1.05rem; line-height: 1.85; color: rgba(255,255,255,.82); font-weight: 300; margin-bottom: 30px; animation: fadeUp 1s .9s both; }
+.card-from{ font-family: 'Playfair Display', serif; font-style: italic; color: var(--accent); animation: fadeUp 1s 1.1s both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+.sparkles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: 32px; }
+.sparkle  { position: absolute; border-radius: 50%; background: var(--accent); opacity: 0; animation: sparkleAnim linear infinite; }
+@keyframes sparkleAnim { 50% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0) translateY(-30px); } }
+
+/* ══════════════════════════════════════
+   SECTION TITLE
+══════════════════════════════════════ */
+.section-title {
+  font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 700;
+  color: #fff; text-align: center; margin-bottom: 6px; animation: fadeUp 1s 1.3s both;
+}
+.section-title span { background: linear-gradient(120deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.section-sub { text-align: center; color: rgba(255,255,255,.4); font-size: .82rem; margin-bottom: 28px; animation: fadeUp 1s 1.4s both; }
+
+/* ══════════════════════════════════════
+   📸  PHOTO GRID
+══════════════════════════════════════ */
+.photos-section { margin-bottom: 60px; animation: fadeUp 1s 1.5s both; }
+
+.photo-grid {
+  display: grid;
+  /* ✏️  Change 3 → 2 or 4 to adjust columns */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+/* Each photo card */
+.photo-item {
+  position: relative; border-radius: 18px; overflow: hidden;
+  aspect-ratio: 4/3; cursor: pointer;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.05);
+  transition: transform .28s, box-shadow .28s;
+}
+.photo-item:hover { transform: translateY(-5px) scale(1.03); box-shadow: 0 18px 44px rgba(0,0,0,.45), 0 0 0 2px var(--primary); }
+.photo-item img   { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+.photo-item:hover img { transform: scale(1.07); }
+
+/* Caption overlay */
+.photo-item .cap-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.75) 0%, transparent 55%);
+  display: flex; align-items: flex-end; padding: 14px;
+  opacity: 0; transition: opacity .25s;
+}
+.photo-item:hover .cap-overlay { opacity: 1; }
+.photo-item .cap { color: #fff; font-size: .8rem; line-height: 1.4; }
+
+/* Zoom icon */
+.photo-item .zoom-badge {
+  position: absolute; top: 10px; right: 10px;
+  background: rgba(0,0,0,.5); backdrop-filter: blur(6px);
+  border-radius: 50%; width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem; opacity: 0; transition: opacity .25s;
+}
+.photo-item:hover .zoom-badge { opacity: 1; }
+
+/* ══════════════════════════════════════
+   🎬  VIDEO GRID
+══════════════════════════════════════ */
+.videos-section { margin-bottom: 80px; animation: fadeUp 1s 1.7s both; }
+
+.video-grid {
+  display: grid;
+  /* ✏️  Change 2 → 1 or 3 to adjust columns */
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+/* Each video card */
+.video-item {
+  position: relative; border-radius: 20px; overflow: hidden;
+  background: rgba(0,0,0,.4); border: 1px solid var(--border);
+  transition: transform .28s, box-shadow .28s;
+}
+.video-item:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,.5), 0 0 0 2px var(--primary); }
+
+/* Native <video> element */
+.video-item video {
+  width: 100%; display: block;
+  border-radius: 20px;
+  background: #000;
+  max-height: 300px;
+  object-fit: cover;
+}
+
+/* YouTube <iframe> embed */
+.video-item .yt-wrap {
+  position: relative; padding-bottom: 56.25%; /* 16:9 */
+  height: 0; overflow: hidden; border-radius: 20px;
+}
+.video-item .yt-wrap iframe {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%; border: none;
+}
+
+/* Video label */
+.video-label {
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.video-label .vl-icon { font-size: 1rem; }
+.video-label .vl-text { color: rgba(255,255,255,.75); font-size: .82rem; line-height: 1.4; }
+.video-label .vl-title { color: #fff; font-weight: 400; display: block; }
+
+/* ══════════════════════════════════════
+   🎵  MUSIC PLAYER
+══════════════════════════════════════ */
+#music-player {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  z-index: 50; background: rgba(12,3,28,.85); backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,107,157,.3); border-radius: 60px;
+  padding: 12px 24px; display: flex; align-items: center; gap: 14px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.5); min-width: 300px;
+}
+.song-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.song-title { font-size: .78rem; color: #fff; letter-spacing: .04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.song-sub   { font-size: .67rem; color: rgba(255,255,255,.4); margin-top: 1px; }
+.prog-wrap  { height: 3px; background: rgba(255,255,255,.1); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+.prog-bar   { height: 100%; background: linear-gradient(to right, var(--primary), var(--accent)); width: 0%; border-radius: 2px; transition: width .25s linear; }
+#ppbtn {
+  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--primary), #c026d3);
+  box-shadow: 0 4px 18px rgba(255,107,157,.45);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border: none; transition: transform .15s, box-shadow .15s;
+}
+#ppbtn:hover { transform: scale(1.12); }
+.vol-wrap { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+#volSlider {
+  -webkit-appearance: none; appearance: none; width: 54px; height: 3px;
+  border-radius: 2px; background: rgba(255,255,255,.18); outline: none; cursor: pointer;
+}
+#volSlider::-webkit-slider-thumb { -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%; background: var(--primary); cursor: pointer; }
+.eq { display: flex; align-items: flex-end; gap: 2px; height: 18px; flex-shrink: 0; }
+.eq-bar { width: 3px; border-radius: 2px; background: linear-gradient(to top,var(--primary),var(--accent)); height: 3px; animation: eqA .5s ease-in-out infinite alternate; }
+.eq-bar:nth-child(1){animation-duration:.42s}.eq-bar:nth-child(2){animation-duration:.6s;animation-delay:.1s}.eq-bar:nth-child(3){animation-duration:.38s}.eq-bar:nth-child(4){animation-duration:.55s;animation-delay:.2s}
+.eq.paused .eq-bar { height: 3px !important; animation-play-state: paused; }
+@keyframes eqA { to { height: 16px; } }
+
+/* SFX chips */
+.sfx-chips { position: fixed; top: 16px; right: 16px; z-index: 50; display: flex; flex-direction: column; gap: 6px; }
+.sfx-chip  { background: rgba(12,3,28,.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.12); border-radius: 20px; padding: 5px 12px; font-size: .68rem; color: rgba(255,255,255,.6); cursor: pointer; user-select: none; transition: all .2s; display: flex; align-items: center; gap: 5px; }
+.sfx-chip.on { border-color: var(--primary); color: #fff; }
+.sfx-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.2); transition: background .2s; }
+.sfx-chip.on .dot { background: var(--primary); }
+
+/* ══════════════════════════════════════
+   LIGHTBOX
+══════════════════════════════════════ */
+#lightbox {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,.93); backdrop-filter: blur(14px);
+  display: none; align-items: center; justify-content: center; flex-direction: column;
+}
+#lightbox.open { display: flex; }
+#lightbox img  { max-width: 90vw; max-height: 80vh; border-radius: 14px; object-fit: contain; box-shadow: 0 24px 80px rgba(0,0,0,.8); }
+.lb-cap   { color: rgba(255,255,255,.75); font-size: .9rem; margin-top: 14px; text-align: center; max-width: 500px; }
+.lb-close { position: absolute; top: 20px; right: 24px; background: rgba(255,255,255,.1); border: none; border-radius: 50%; width: 40px; height: 40px; color: #fff; font-size: 1.2rem; cursor: pointer; }
+.lb-close:hover { background: rgba(255,107,157,.6); }
+.lb-nav   { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,.1); border: none; border-radius: 50%; width: 44px; height: 44px; color: #fff; font-size: 1.5rem; cursor: pointer; }
+.lb-nav:hover { background: rgba(255,107,157,.6); }
+#lbPrev { left: 20px; } #lbNext { right: 20px; }
+.lb-dots { display: flex; gap: 6px; margin-top: 12px; }
+.lb-dot  { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.28); cursor: pointer; transition: background .2s; }
+.lb-dot.active { background: var(--primary); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .card        { padding: 40px 28px; }
+  .photo-grid  { grid-template-columns: repeat(2,1fr) !important; }
+  .video-grid  { grid-template-columns: 1fr !important; }
+  #music-player{ min-width: 260px; padding: 10px 16px; }
+  .sfx-chips   { top: 10px; right: 10px; }
+  .lb-nav      { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ BACKGROUND ═══════ -->
+<canvas id="stars-canvas"></canvas>
+<canvas id="fw-canvas"></canvas>
+<div class="moon"></div>
+<div class="ground"></div>
+<div class="balloon-container" id="balloonContainer"></div>
+<div id="notesContainer"></div>
+
+<!-- SFX Toggles -->
+<div class="sfx-chips">
+  <div class="sfx-chip on" id="chip-fw" ><span class="dot"></span>🎆 Firework SFX</div>
+  <div class="sfx-chip on" id="chip-bal"><span class="dot"></span>🎈 Balloon Pop</div>
+  <div class="sfx-chip on" id="chip-spk"><span class="dot"></span>✨ Click Tinkle</div>
+</div>
+
+<!-- ═══════ PAGE ═══════ -->
+<div class="page">
+
+  <!-- ░░ BIRTHDAY CARD ░░ -->
+  <div class="card">
+    <div class="sparkles" id="sparkles"></div>
+    <div class="candles" id="candles"></div>
+    <span class="cake-wrap">🎂</span>
+    <div class="hb-label">Happy Birthday</div>
+    <div class="card-name" id="cName"></div>
+    <div class="divider"></div>
+    <p class="card-msg"  id="cMsg"></p>
+    <div class="card-from" id="cFrom"></div>
+  </div>
+
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+       📸  PHOTO SECTION
+       ─────────────────────────────────────────────
+       HOW TO ADD YOUR PHOTOS:
+         1. Replace src="..." with your image file path
+            or paste a direct image URL.
+         2. Update the alt="" and caption text.
+         3. Copy-paste a <div class="photo-item"> block
+            to add more photos.
+         4. Change grid-template-columns in CSS (top)
+            from repeat(3,...) to repeat(2,...) for 2 cols.
+       ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <div class="photos-section">
+    <div class="section-title">📸 Kitne <span>Sundar Photos hai Wow Very Beautiful❤</span></div>
+    <div class="section-sub">Click any photo to view it fullscreen</div>
+
+    <div class="photo-grid" id="photoGrid">
+
+      <!-- ── PHOTO 1 ── Replace src with your image ── -->
+      <div class="photo-item" onclick="openLB(0)">
+        <img src="imagess/jinal2.jpeg" alt="Our Memory 1">
+        <div class="cap-overlay"><p class="cap">Your 18th birthday celebration 💕</p></div>
+        <div class="zoom-badge">🔍</div>
+      </div>
+
+      <!-- ── PHOTO 2 ── -->
+      <div class="photo-item" onclick="openLB(1)">
+        <img src="imagess/jinal3..jpeg" alt="Our Memory 2">
+        <div class="cap-overlay"><p class="cap">Pure beauty (btw my fav pic) 💗</p></div>
+        <div class="zoom-badge">🔍</div>
+      </div>
+
+      <!-- ── PHOTO 3 ── -->
+      <div class="photo-item" onclick="openLB(2)">
+        <img src="imagess/jinal1.jpeg" alt="Our Memory 3">
+        <div class="cap-overlay"><p class="cap">Your beautiful smile 😊</p></div>
+        <div class="zoom-badge">🔍</div>
+      </div>
+
+      <!-- ── PHOTO 4 ── -->
+      <div class="photo-item" onclick="openLB(3)">
+        <img src="imagess/jinal4.jpeg" alt="Our Memory 4">
+        <div class="cap-overlay"><p class="cap">Kya mast pose hai bhaisahab ✨</p></div>
+        <div class="zoom-badge">🔍</div>
+      </div>
+
+      <!-- ── PHOTO 5 ── -->
+      <div class="photo-item" onclick="openLB(4)">
+        <img src="imagess/jinal5.jpeg" alt="Our Memory 5">
+        <div class="cap-overlay"><p class="cap">Always laughing 😄</p></div>
+        <div class="zoom-badge">🔍</div>
+      </div>
+
+      <!-- ── PHOTO 6 ── -->
+      <div class="photo-item" onclick="openLB(5)">
+        <img src="imagess/jinal6.jpeg" alt="Our Memory 6">
+        <div class="cap-overlay"><p class="cap">Baddie number 1💖</p></div>
+        <div class="zoom-badge">🔍</div>
+      </div>
+
+      <!-- ✏️ ADD MORE PHOTOS: Copy one block above and paste here -->
+
+    </div><!-- end .photo-grid -->
+  </div><!-- end .photos-section -->
+
+
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+       🎬  VIDEO SECTION
+       ─────────────────────────────────────────────
+       HOW TO ADD YOUR VIDEOS:
+
+       A) LOCAL VIDEO FILE:
+          Use the <video> block. Set src="yourfile.mp4"
+          You can set poster="thumbnail.jpg" too.
+
+       B) YOUTUBE VIDEO:
+          Use the <div class="yt-wrap"> block.
+          Replace VIDEO_ID with the YouTube video ID.
+          (The ID is the part after ?v= in the URL)
+
+       C) CAPTION: Edit the text in .vl-title
+       ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <div class="videos-section">
+    <div class="section-title">🎬 Your <span>Beautiful Videos</span></div>
+    <div class="section-sub">Your stupidity in form of video</div>
+
+    <div class="video-grid">
+
+      <!-- ══ VIDEO 1 — YouTube Embed ══
+           ✏️  Replace VIDEO_ID_HERE with actual YouTube video ID
+           Example: for https://youtube.com/watch?v=abc123
+                    use VIDEO_ID_HERE = abc123              -->
+      <div class="video-item">
+        <div class="yt-wrap">
+          <video width="300" controls poster="imagess/t2.jpeg">
+  <source src="videoo/jv2.mp4" type="video/mp4">
+</video>   </div>
+        <div class="video-label">
+          <span class="vl-icon">️🎂</span>
+          <div class="vl-text">
+            <span class="vl-title">18th birthday party🎂🎉🎈🎵</span>
+            The birthday that You will never forget Jinal🤪😁
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VIDEO 2 —  Embed ══ -->
+      <div class="video-item">
+        <div class="yt-wrap">
+        <video width="300" controls poster="imagess/thumb.jpeg">
+  <source src="videoo/jv1.mp4" type="video/mp4">
+</video>
+        </div>
+        <div class="video-label">
+          <span class="vl-icon">🎬</span>
+          <div class="vl-text">
+            <span class="vl-title">A Message For You😭😂 💌</span>
+            Ye Video ko dekh ke abhi bhi hasne aata hai
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VIDEO 3 — Local MP4 File ══
+           ✏️  Replace src="YOUR_VIDEO.mp4" with your file.
+           Add poster="thumbnail.jpg" for a preview image.   -->
+      <!--
+      <div class="video-item">
+        <video controls poster="YOUR_THUMBNAIL.jpg">
+          <source src="YOUR_VIDEO.mp4" type="video/mp4">
+          Your browser does not support this video.
+        </video>
+        <div class="video-label">
+          <span class="vl-icon">🎥</span>
+          <div class="vl-text">
+            <span class="vl-title">Our Trip Together ✈️</span>
+            A video I made just for you
+          </div>
+        </div>
+      </div>
+      -->
+
+      <!-- ✏️ ADD MORE VIDEOS: Copy one block above and paste here -->
+
+    </div><!-- end .video-grid -->
+  </div><!-- end .videos-section -->
+
+</div><!-- end .page -->
+
+<!-- ══════ LIGHTBOX ══════ -->
+<div id="lightbox">
+  <button class="lb-close" id="lbClose">✕</button>
+  <button class="lb-nav" id="lbPrev">‹</button>
+  <button class="lb-nav" id="lbNext">›</button>
+  <img id="lbImg" src="" alt="">
+  <div class="lb-cap" id="lbCap"></div>
+  <div class="lb-dots" id="lbDots"></div>
+</div>
+
+<!-- ══════ MUSIC PLAYER ══════ -->
+<div id="music-player">
+  <div class="eq paused" id="eq">
+    <div class="eq-bar"></div><div class="eq-bar"></div>
+    <div class="eq-bar"></div><div class="eq-bar"></div>
+  </div>
+  <div class="song-info">
+    <div class="song-title">🎂 Happy Birthday (Live Synth)</div>
+    <div class="song-sub">Click ▶ to play · click anywhere = firework!</div>
+    <div class="prog-wrap"><div class="prog-bar" id="progBar"></div></div>
+  </div>
+  <div class="vol-wrap">
+    <svg style="opacity:.5" width="13" height="13" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>
+    </svg>
+    <input type="range" id="volSlider" min="0" max="1" step="0.01" value="0.65">
+  </div>
+  <button id="ppbtn">
+    <svg id="icoPlay"  width="16" height="16" viewBox="0 0 24 24" fill="white"><polygon points="6,3 20,12 6,21"/></svg>
+    <svg id="icoPause" width="16" height="16" viewBox="0 0 24 24" fill="white" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+  </button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════ -->
+<script>
+/* ── Apply CONFIG colors & text ── */
+const S = document.documentElement.style;
+S.setProperty('--primary', CONFIG.primaryColor);
+S.setProperty('--accent',  CONFIG.accentColor);
+S.setProperty('--bg1',     CONFIG.bgColor1);
+S.setProperty('--bg2',     CONFIG.bgColor2);
+document.getElementById('cName').innerHTML  = `<span>${CONFIG.name}</span>`;
+document.getElementById('cMsg').textContent  = CONFIG.message;
+document.getElementById('cFrom').textContent = CONFIG.from;
+
+/* ════════════════════════════════════
+   🔊  AUDIO ENGINE (Web Audio API)
+════════════════════════════════════ */
+let AC=null, MG=null, RV=null, RVG=null;
+function audio(){
+  if(!AC){
+    AC=new(window.AudioContext||window.webkitAudioContext)();
+    MG=AC.createGain(); MG.gain.value=parseFloat(document.getElementById('volSlider').value); MG.connect(AC.destination);
+    RV=AC.createConvolver();
+    const len=AC.sampleRate*2.2, b=AC.createBuffer(2,len,AC.sampleRate);
+    for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.8);}
+    RV.buffer=b; RVG=AC.createGain(); RVG.gain.value=.22; RV.connect(RVG); RVG.connect(MG);
+  }
+  if(AC.state==='suspended')AC.resume();
+  return AC;
+}
+function osc(f,t,dur,type='triangle',vol=.18,rev=false){
+  const ctx=audio(),o=ctx.createOscillator(),e=ctx.createGain();
+  o.type=type; o.frequency.setValueAtTime(f,t);
+  e.gain.setValueAtTime(0,t); e.gain.linearRampToValueAtTime(vol,t+.015);
+  e.gain.setTargetAtTime(0,t+dur*.72,dur*.14);
+  o.connect(e); e.connect(MG); if(rev)o.connect(RV);
+  o.start(t); o.stop(t+dur+.15);
+}
+
+/* SFX */
+function sfxBoom(){
+  if(!CONFIG.sfxFireworks)return;
+  const ctx=audio(),t=ctx.currentTime;
+  const bl=ctx.sampleRate*.35,bb=ctx.createBuffer(1,bl,ctx.sampleRate),bd=bb.getChannelData(0);
+  for(let i=0;i<bl;i++)bd[i]=Math.random()*2-1;
+  const ns=ctx.createBufferSource();ns.buffer=bb;
+  const nf=ctx.createBiquadFilter();nf.type='lowpass';nf.frequency.setValueAtTime(900,t);nf.frequency.exponentialRampToValueAtTime(70,t+.35);
+  const ne=ctx.createGain();ne.gain.setValueAtTime(.4,t);ne.gain.exponentialRampToValueAtTime(.001,t+.38);
+  ns.connect(nf);nf.connect(ne);ne.connect(MG);ns.start(t);ns.stop(t+.45);
+  const o=ctx.createOscillator(),te=ctx.createGain();
+  o.frequency.setValueAtTime(130,t);o.frequency.exponentialRampToValueAtTime(28,t+.28);
+  te.gain.setValueAtTime(.55,t);te.gain.exponentialRampToValueAtTime(.001,t+.32);
+  o.connect(te);te.connect(MG);o.start(t);o.stop(t+.38);
+}
+function sfxPop(){
+  if(!CONFIG.sfxBalloon)return;
+  const ctx=audio(),t=ctx.currentTime;
+  const bl=ctx.sampleRate*.1,buf=ctx.createBuffer(1,bl,ctx.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<bl;i++)d[i]=(Math.random()*2-1)*(1-i/bl);
+  const s=ctx.createBufferSource();s.buffer=buf;
+  const f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=1000;
+  const e=ctx.createGain();e.gain.setValueAtTime(.7,t);e.gain.exponentialRampToValueAtTime(.001,t+.1);
+  s.connect(f);f.connect(e);e.connect(MG);s.start(t);
+}
+function sfxTinkle(x){
+  if(!CONFIG.sfxSparkle)return;
+  const ctx=audio(),t=ctx.currentTime,f=700+(x/innerWidth)*1100;
+  osc(f,t,.45,'sine',.1,true); osc(f*1.5,t+.04,.3,'sine',.05,true); osc(f*2,t+.09,.2,'sine',.03,true);
+}
+
+/* ── Happy Birthday Song ── */
+const N={C3:130.81,F3:174.61,G3:196,C4:261.63,D4:293.66,E4:329.63,F4:349.23,G4:392,A4:440,B4:493.88,C5:523.25};
+const MEL=[[N.C4,.75],[N.C4,.25],[N.D4,1],[N.C4,1],[N.F4,1],[N.E4,2],[N.C4,.75],[N.C4,.25],[N.D4,1],[N.C4,1],[N.G4,1],[N.F4,2],[N.C4,.75],[N.C4,.25],[N.C5,1],[N.A4,1],[N.F4,1],[N.E4,1],[N.D4,2],[N.A4,.75],[N.A4,.25],[N.G4,1],[N.F4,1],[N.G4,1],[N.F4,2.5]];
+const HAR=[[N.G3,.75],[N.G3,.25],[N.G3,1],[N.C4,1],[N.C4,1],[N.C4,2],[N.G3,.75],[N.G3,.25],[N.G3,1],[N.C4,1],[N.D4,1],[N.C4,2],[N.E4,.75],[N.E4,.25],[N.E4,1],[N.C4,1],[N.C4,1],[N.C4,1],[N.B4,2],[N.F4,.75],[N.F4,.25],[N.E4,1],[N.C4,1],[N.D4,1],[N.C4,2.5]];
+const BAS=[[N.F3,1],[N.C3,1],[N.C3,1],[N.F3,1],[N.C3,1],[N.C3,1],[N.G3,1],[N.C3,1],[N.C3,1],[N.F3,1],[N.C3,1],[N.C3,1],[N.F3,1],[N.C3,1],[N.C3,1],[N.F3,1],[N.C3,1],[N.C3,1],[N.G3,1],[N.C3,1],[N.C3,1],[N.F3,1.5],[N.C3,.5],[N.G3,.5],[N.F3,.5]];
+
+let playing=false,sStart=0,sDur=0,pInt=null,lTO=null;
+function schArr(arr,t0,beat,v,type,rev){let t=t0;arr.forEach(([f,b])=>{const d=b*beat;osc(f,t,d,type,v,rev);t+=d;});}
+function schBass(t0,beat,total){const bd=BAS.reduce((s,[,b])=>s+b*beat,0);let t=t0;while(t<t0+total+beat){BAS.forEach(([f,b])=>{osc(f,t,b*beat*.7,'sine',.18);t+=b*beat;});}}
+function schPerc(t0,total){
+  const beat=60/CONFIG.musicTempo; let t=t0;
+  while(t<t0+total){
+    audio();
+    (function(kt){const o=AC.createOscillator(),e=AC.createGain();o.frequency.setValueAtTime(160,kt);o.frequency.exponentialRampToValueAtTime(35,kt+.09);e.gain.setValueAtTime(.45,kt);e.gain.exponentialRampToValueAtTime(.001,kt+.22);o.connect(e);e.connect(MG);o.start(kt);o.stop(kt+.28);})(t);
+    for(let i=0;i<3;i++){(function(ht){const bl=AC.sampleRate*.04,buf=AC.createBuffer(1,bl,AC.sampleRate),d=buf.getChannelData(0);for(let j=0;j<bl;j++)d[j]=Math.random()*2-1;const s=AC.createBufferSource();s.buffer=buf;const f=AC.createBiquadFilter();f.type='highpass';f.frequency.value=9000;const e=AC.createGain();e.gain.setValueAtTime(i?0.05:.09,ht);e.gain.exponentialRampToValueAtTime(.001,ht+.04);s.connect(f);f.connect(e);e.connect(MG);s.start(ht);})(t+i*beat);}
+    t+=beat*3;
+  }
+}
+function playSong(){
+  const beat=60/CONFIG.musicTempo;
+  sDur=MEL.reduce((s,[,b])=>s+b*beat,0);
+  sStart=audio().currentTime+.12;
+  for(let p=0;p<2;p++){
+    const off=sStart+p*sDur;
+    schArr(MEL,off,beat,.22,'triangle',true);
+    MEL.reduce((t,[f,b])=>{const d=b*beat;osc(f*2,t+.02,d*.6,'sine',.05,true);return t+d;},off);
+    schArr(HAR,off,beat,.09,'sine',true);
+    schBass(off,beat,sDur);
+    schPerc(off,sDur);
+  }
+  return sDur*2;
+}
+function startProg(total){
+  clearInterval(pInt);
+  const bar=document.getElementById('progBar');
+  pInt=setInterval(()=>{if(!playing||!AC)return;const el=Math.max(0,AC.currentTime-sStart);bar.style.width=Math.min(100,(el/total)*100)+'%';if(el>=total)bar.style.width='0%';},120);
+}
+const ppbtn=document.getElementById('ppbtn'),iPlay=document.getElementById('icoPlay'),iPause=document.getElementById('icoPause'),eq=document.getElementById('eq');
+ppbtn.addEventListener('click',()=>{
+  if(!playing){
+    playing=true;iPlay.style.display='none';iPause.style.display='block';eq.classList.remove('paused');
+    const d=playSong();startProg(d);
+    lTO=setTimeout(function loop(){if(!playing)return;const nd=playSong();startProg(nd);lTO=setTimeout(loop,(nd+.3)*1000);},(d+.2)*1000);
+  } else {
+    playing=false;iPlay.style.display='block';iPause.style.display='none';eq.classList.add('paused');
+    clearInterval(pInt);clearTimeout(lTO);if(AC)AC.suspend();
+  }
+});
+document.getElementById('volSlider').addEventListener('input',function(){audio();MG.gain.value=parseFloat(this.value);});
+
+/* ═══════ STARS ═══════ */
+(function(){
+  const cv=document.getElementById('stars-canvas'),ctx=cv.getContext('2d');let st=[];
+  function rz(){cv.width=innerWidth;cv.height=innerHeight;st=Array.from({length:CONFIG.numStars},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height*.85,r:Math.random()*1.8+.3,ph:Math.random()*Math.PI*2,sp:Math.random()*.4+.2}));}
+  rz();addEventListener('resize',rz);
+  (function draw(t){ctx.clearRect(0,0,cv.width,cv.height);st.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,240,${.4+.6*Math.abs(Math.sin(s.ph+t*s.sp*.001))})`;ctx.fill();});requestAnimationFrame(draw);})(0);
+})();
+
+/* ═══════ BALLOONS ═══════ */
+(function(){
+  const cols=['#ff6b9d','#ffd700','#a78bfa','#34d399','#fb923c','#60a5fa','#f472b6','#facc15'],cont=document.getElementById('balloonContainer');
+  for(let i=0;i<CONFIG.numBalloons;i++){
+    const b=document.createElement('div');b.className='balloon';const col=cols[i%cols.length];
+    b.innerHTML=`<svg viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="bg${i}" cx="35%" cy="30%"><stop offset="0%" stop-color="rgba(255,255,255,0.65)"/><stop offset="100%" stop-color="${col}"/></radialGradient></defs><ellipse cx="30" cy="35" rx="28" ry="33" fill="url(#bg${i})"/><ellipse cx="22" cy="22" rx="7" ry="5" fill="rgba(255,255,255,.35)" transform="rotate(-20,22,22)"/><polygon points="30,68 26,74 34,74" fill="${col}"/></svg>`;
+    b.style.cssText=`left:${Math.random()*95}%;animation-duration:${8+Math.random()*10}s;animation-delay:${Math.random()*12}s;width:${40+Math.random()*25}px`;
+    b.addEventListener('click',e=>{e.stopPropagation();sfxPop();});
+    cont.appendChild(b);
+  }
+})();
+
+/* 🕯️ CANDLES */
+(function(){const c=document.getElementById('candles');for(let i=0;i<5;i++){const f=document.createElement('div');f.className='flame';f.style.animationDelay=`${i*.13}s`;c.appendChild(f);}})();
+
+/* ✨ CARD SPARKLES */
+(function(){const cont=document.getElementById('sparkles');for(let i=0;i<14;i++){const s=document.createElement('div');s.className='sparkle';s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*4}s;width:${4+Math.random()*6}px;height:${4+Math.random()*6}px`;cont.appendChild(s);}})();
+
+/* ♪ NOTES */
+(function(){const notes=['♪','♫','♬','♩'],nc=document.getElementById('notesContainer');for(let i=0;i<6;i++){const n=document.createElement('div');n.className='note';n.textContent=notes[i%notes.length];n.style.cssText=`left:${10+Math.random()*80}%;bottom:${120+Math.random()*100}px;color:${CONFIG.primaryColor};animation-delay:${i*1.2}s;animation-duration:${5+Math.random()*3}s`;nc.appendChild(n);}})();
+
+/* 🎆 FIREWORKS */
+const FC=document.getElementById('fw-canvas'),FX=FC.getContext('2d'),FP=[],FC2=[CONFIG.primaryColor,CONFIG.accentColor,'#a78bfa','#60a5fa','#34d399','#fb923c','#f9a8d4','#fff'];
+function rzFW(){FC.width=innerWidth;FC.height=innerHeight;}rzFW();addEventListener('resize',rzFW);
+function burst(x,y,sfx=true){const col=FC2[Math.floor(Math.random()*FC2.length)];for(let i=0;i<70;i++){const a=(Math.PI*2/70)*i,sp=2+Math.random()*6;FP.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,decay:.011+Math.random()*.016,r:2+Math.random()*2.5,color:col,trail:[]});}if(sfx)sfxBoom();}
+(function sb(){burst(80+Math.random()*(innerWidth-160),60+Math.random()*(innerHeight*.5));setTimeout(sb,900+Math.random()*2400);})();
+(function aFW(){FX.clearRect(0,0,FC.width,FC.height);for(let i=FP.length-1;i>=0;i--){const p=FP[i];p.trail.push({x:p.x,y:p.y});if(p.trail.length>6)p.trail.shift();p.x+=p.vx;p.y+=p.vy;p.vy+=.06;p.vx*=.98;p.life-=p.decay;if(p.life<=0){FP.splice(i,1);continue;}p.trail.forEach((pt,ti)=>{FX.beginPath();FX.arc(pt.x,pt.y,p.r*(ti/p.trail.length)*.5,0,Math.PI*2);FX.fillStyle=p.color+Math.floor(p.life*55).toString(16).padStart(2,'0');FX.fill();});FX.beginPath();FX.arc(p.x,p.y,p.r,0,Math.PI*2);FX.fillStyle=p.color+Math.floor(p.life*255).toString(16).padStart(2,'0');FX.fill();}requestAnimationFrame(aFW);})();
+
+/* 🖱️ CLICK */
+document.addEventListener('click',e=>{
+  if(e.target.closest('#music-player,.balloon,.sfx-chips,#lightbox,.video-item,.photo-item'))return;
+  burst(e.clientX,e.clientY,false);sfxTinkle(e.clientX);
+  const r=document.createElement('div');r.className='click-ripple';r.style.cssText=`left:${e.clientX}px;top:${e.clientY}px`;
+  document.body.appendChild(r);setTimeout(()=>r.remove(),700);
+});
+
+/* SFX CHIPS */
+function chip(id,k){const el=document.getElementById(id);el.addEventListener('click',()=>{CONFIG[k]=!CONFIG[k];el.classList.toggle('on',CONFIG[k]);});}
+chip('chip-fw','sfxFireworks');chip('chip-bal','sfxBalloon');chip('chip-spk','sfxSparkle');
+
+/* ════════════════════════════════════
+   🔍 PHOTO LIGHTBOX
+════════════════════════════════════ */
+// Collect all photo items for lightbox navigation
+const photoItems = document.querySelectorAll('.photo-item');
+let lbIndex = 0;
+
+// Build data from DOM
+function getPhotoData(idx){
+  const item = photoItems[idx];
+  if(!item) return null;
+  return {
+    src:     item.querySelector('img').src,
+    caption: item.querySelector('.cap') ? item.querySelector('.cap').textContent : ''
+  };
+}
+
+function openLB(idx){
+  lbIndex = idx;
+  renderLB();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLB(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function renderLB(){
+  const d = getPhotoData(lbIndex);
+  if(!d) return;
+  document.getElementById('lbImg').src = d.src;
+  document.getElementById('lbCap').textContent = d.caption;
+  // Dots
+  const dots = document.getElementById('lbDots');
+  dots.innerHTML = '';
+  photoItems.forEach((_,i)=>{
+    const dot = document.createElement('div');
+    dot.className = 'lb-dot' + (i===lbIndex?' active':'');
+    dot.onclick = ()=>{ lbIndex=i; renderLB(); };
+    dots.appendChild(dot);
+  });
+}
+
+document.getElementById('lbClose').onclick = closeLB;
+document.getElementById('lbPrev').onclick   = ()=>{ lbIndex=(lbIndex-1+photoItems.length)%photoItems.length; renderLB(); };
+document.getElementById('lbNext').onclick   = ()=>{ lbIndex=(lbIndex+1)%photoItems.length; renderLB(); };
+document.getElementById('lightbox').addEventListener('click', e=>{ if(e.target===document.getElementById('lightbox'))closeLB(); });
+document.addEventListener('keydown', e=>{
+  if(!document.getElementById('lightbox').classList.contains('open')) return;
+  if(e.key==='Escape') closeLB();
+  if(e.key==='ArrowLeft'){  lbIndex=(lbIndex-1+photoItems.length)%photoItems.length; renderLB(); }
+  if(e.key==='ArrowRight'){ lbIndex=(lbIndex+1)%photoItems.length; renderLB(); }
+});
+</script>
+</body>
+</html>
